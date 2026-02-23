@@ -1,0 +1,5 @@
+{
+  "name": "Mystical Chef's Grimoire",
+  "description": "Transform ordinary ingredients into magical dishes with the help of an ancient mystical chef.",
+  "requestFramePermissions": ["camera"]
+}
