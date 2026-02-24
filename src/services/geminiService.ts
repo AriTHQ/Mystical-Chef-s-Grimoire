@@ -1,6 +1,23 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const apiKey = ((import.meta as any).env?.VITE_GEMINI_API_KEY as string) || (process.env.GEMINI_API_KEY as string) || "";
+// Safe access to environment variables
+const getApiKey = () => {
+  try {
+    // Try Vite's import.meta.env first (for VITE_ prefixed keys)
+    if ((import.meta as any).env?.VITE_GEMINI_API_KEY) {
+      return (import.meta as any).env.VITE_GEMINI_API_KEY;
+    }
+    // Try process.env (which is shimmed by Vite's define)
+    if (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) {
+      return process.env.GEMINI_API_KEY;
+    }
+  } catch (e) {
+    console.warn("Environment variable access failed", e);
+  }
+  return "";
+};
+
+const apiKey = getApiKey();
 const ai = new GoogleGenAI({ apiKey });
 
 export interface MagicalDish {
@@ -19,6 +36,9 @@ export interface MagicalDish {
 }
 
 export async function generateMagicalDish(ingredients: { name: string; quantity: string }[]): Promise<MagicalDish> {
+  if (!apiKey) {
+    throw new Error("召唤失败：未检测到奥术密钥 (GEMINI_API_KEY)。请在环境变量中配置密钥。");
+  }
   const ingredientsString = ingredients.map(ing => `${ing.quantity} ${ing.name}`).join(", ");
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",

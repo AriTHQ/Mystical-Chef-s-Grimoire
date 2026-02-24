@@ -10,7 +10,7 @@ export default defineConfig(({mode}) => {
     define: {
       'process.env': JSON.stringify(env),
       'process.browser': true,
-      'global': {},
+      'global': 'globalThis',
     },
     resolve: {
       alias: {

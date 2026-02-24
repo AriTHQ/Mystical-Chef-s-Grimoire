@@ -7,6 +7,10 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Global shim for process.env to prevent crashes in browser
+      window.process = window.process || { env: {} };
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
