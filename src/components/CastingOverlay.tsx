@@ -208,16 +208,26 @@ export const CastingOverlay: React.FC<CastingOverlayProps> = ({ onComplete, onCa
     handsRef.current = hands;
 
     let isRunning = true;
-    const process = async () => {
-      if (!webcamRef.current?.video || !isRunning) return;
-      await hands.send({ image: webcamRef.current.video });
-      if (isRunning) requestAnimationFrame(process);
+    const processVideo = async () => {
+      if (!webcamRef.current?.video || !isRunning || status !== 'casting') return;
+      
+      const video = webcamRef.current.video;
+      // Check if video is ready to be processed
+      if (video.readyState >= 2) { // HAVE_CURRENT_DATA or higher
+        try {
+          await hands.send({ image: video });
+        } catch (err) {
+          console.error("MediaPipe processing error:", err);
+        }
+      }
+      
+      if (isRunning) requestAnimationFrame(processVideo);
     };
 
     const timer = setTimeout(() => {
       setIsInitialized(true);
-      process();
-    }, 1000);
+      processVideo();
+    }, 1500);
 
     return () => {
       isRunning = false;
